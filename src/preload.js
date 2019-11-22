@@ -31,23 +31,26 @@ window.addEventListener('DOMContentLoaded', () => {
   $selectDirectoryBtn.click(function () {
     ipcRenderer.send('open-directory-dialog','openDirectory',$directoryInput.val());
     ipcRenderer.on('selectedItem',function (e,path) {
-      $directoryInput.val(path);
-      let fileName = 'profile.js';
-      let files = fs.readdirSync(path);
-      if(files.indexOf(fileName) > -1){ //判断文件夹下是否包含指定文件
-        let fullPath = path + '/' + fileName;
-        _readTxtFromFile(fullPath,function (txt) {
-          $('.result').html(txt);
-          let newTxt = txt;
-          fs.writeFile(fullPath,newTxt,function(err){
-            if (err) {
-              throw err;
-            }
-            alert("写入成功！");
-          })
-        });
-      }else {
-        alert("您选择的文件夹内不包含"+fileName+'文件，请重新选择！');
+      if(path){
+        $directoryInput.val(path);
+        let fileName = 'profile.js';
+        let files = fs.readdirSync(path);
+        if(files.indexOf(fileName) > -1){ //判断文件夹下是否包含指定文件
+          let fullPath = path + '/' + fileName;
+          _readTxtFromFile(fullPath,function (txt) {
+            $('.result').html(txt);
+            let newTxt = txt;
+            //写入
+            fs.writeFile(fullPath,newTxt,function(err){
+              if (err) {
+                throw err;
+              }
+              alert('写入成功！');
+            })
+          });
+        }else {
+          alert("您选择的文件夹内不包含"+fileName+'文件，请重新选择！');
+        }
       }
     });
   });
